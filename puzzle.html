@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Puzzle</title>
+<style>
+body { font-family: sans-serif; text-align: center; }
+#board { display: grid; margin: 20px auto; gap: 2px; }
+.tile { background-size: cover; background-position: center; cursor: pointer; }
+</style>
+</head>
+<body>
+<h2>Puzzle</h2>
+<div id="board"></div>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const img = urlParams.get('img');
+const size = parseInt(urlParams.get('size') || 3);
+const board = document.getElementById('board');
+board.style.gridTemplateColumns = `repeat(${size}, 100px)`;
+let pieces = [];
+for (let y=0; y<size; y++) {
+  for (let x=0; x<size; x++) {
+    pieces.push({x,y});
+  }
+}
+pieces.sort(()=>Math.random()-0.5);
+pieces.forEach(p=>{
+  const div = document.createElement('div');
+  div.className='tile';
+  div.style.width='100px';
+  div.style.height='100px';
+  div.style.backgroundImage=`url(${img})`;
+  div.style.backgroundSize = `${size*100}px ${size*100}px`;
+  div.style.backgroundPosition = `-${p.x*100}px -${p.y*100}px`;
+  board.appendChild(div);
+});
+</script>
+</body>
+</html>
