@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Puzzle interactif</title>
+<style>
+body { font-family: sans-serif; text-align: center; margin: 0; padding: 0; }
+#board { display: grid; margin: 20px auto; gap: 2px; touch-action: none; }
+.tile { background-size: cover; background-position: center; cursor: pointer; user-select: none; }
+</style>
+</head>
+<body>
+<h2>Puzzle interactif</h2>
+<div id="board"></div>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const img = urlParams.get('puzzle');
+const size = parseInt(urlParams.get('size') || 3);
+const board = document.getElementById('board');
+board.style.gridTemplateColumns = `repeat(${size}, 100px)`;
+board.style.gridTemplateRows = `repeat(${size}, 100px)`;
+let pieces = [];
+for(let y=0; y<size; y++){
+  for(let x=0; x<size; x++){
+    pieces.push({x:x, y:y});
+  }
+}
+pieces.sort(()=>Math.random()-0.5);
+pieces.forEach((p,i)=>{
+  const div = document.createElement('div');
+  div.className='tile';
+  div.draggable = true;
+  div.style.width='100px';
+  div.style.height='100px';
+  div.style.backgroundImage=`url(${img})`;
+  div.style.backgroundSize = `${size*100}px ${size*100}px`;
+  div.style.backgroundPosition = `-${p.x*100}px -${p.y*100}px`;
+  div.dataset.index = i;
+  board.appendChild(div);
+});
+
+let dragSrc = null;
+function handleDragStart(e){ dragSrc = e.target; }
+function handleDragOver(e){ e.preventDefault(); }
+function handleDrop(e){
+  e.preventDefault();
+  if(dragSrc !== e.target){
+    const srcPos = dragSrc.style.backgroundPosition;
+    dragSrc.style.backgroundPosition = e.target.style.backgroundPosition;
+    e.target.style.backgroundPosition = srcPos;
+  }
+}
+board.querySelectorAll('.tile').forEach(tile=>{
+  tile.addEventListener('dragstart', handleDragStart);
+  tile.addEventListener('dragover', handleDragOver);
+  tile.addEventListener('drop', handleDrop);
+});
+</script>
+</body>
+</html>
